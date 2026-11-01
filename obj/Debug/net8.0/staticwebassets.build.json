@@ -1,11 +1,39 @@
 {
   "Version": 1,
-  "Hash": "STEV42fjj5oWPSLyBhhRX7iSDkC5UWDuxlMVtSMNIWg=",
+  "Hash": "P6P4cMioEUBAyXnpwGFKv6D37YNEdaEMW9wYO5HPSBk=",
   "Source": "ServiceBooking",
   "BasePath": "_content/ServiceBooking",
   "Mode": "Default",
   "ManifestType": "Build",
   "ReferencedProjectsConfiguration": [],
-  "DiscoveryPatterns": [],
-  "Assets": []
+  "DiscoveryPatterns": [
+    {
+      "Name": "ServiceBooking\\wwwroot",
+      "Source": "ServiceBooking",
+      "ContentRoot": "C:\\Users\\Lenovo\\source\\repos\\ServiceBooking\\wwwroot\\",
+      "BasePath": "_content/ServiceBooking",
+      "Pattern": "**"
+    }
+  ],
+  "Assets": [
+    {
+      "Identity": "C:\\Users\\Lenovo\\source\\repos\\ServiceBooking\\wwwroot\\index.html",
+      "SourceId": "ServiceBooking",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\Lenovo\\source\\repos\\ServiceBooking\\wwwroot\\",
+      "BasePath": "_content/ServiceBooking",
+      "RelativePath": "index.html",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\index.html"
+    }
+  ]
 }

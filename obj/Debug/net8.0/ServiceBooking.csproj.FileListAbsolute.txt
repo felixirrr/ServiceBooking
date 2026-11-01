@@ -62,3 +62,4 @@ C:\Users\Lenovo\source\repos\ServiceBooking\obj\Debug\net8.0\refint\ServiceBooki
 C:\Users\Lenovo\source\repos\ServiceBooking\obj\Debug\net8.0\ServiceBooking.pdb
 C:\Users\Lenovo\source\repos\ServiceBooking\obj\Debug\net8.0\ServiceBooking.genruntimeconfig.cache
 C:\Users\Lenovo\source\repos\ServiceBooking\obj\Debug\net8.0\ref\ServiceBooking.dll
+C:\Users\Lenovo\source\repos\ServiceBooking\bin\Debug\net8.0\ServiceBooking.staticwebassets.runtime.json

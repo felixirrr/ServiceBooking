@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Бронирование услуг</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 35px auto;
+      padding: 0 18px;
+      color: #243044;
+      background: #f4f7fb;
+    }
+
+    h1, h2 {
+      color: #263b65;
+    }
+
+    form, .card {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 3px 14px #00000012;
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin: 14px 0;
+    }
+
+    input, select, button {
+      box-sizing: border-box;
+      width: 100%;
+      padding: 11px;
+      margin-top: 6px;
+      font-size: 16px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 7px;
+      color: white;
+      background: #4868c7;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #3653a6;
+    }
+
+    .cancel {
+      width: auto;
+      padding: 7px 12px;
+      background: #c84a4a;
+    }
+
+    #message {
+      min-height: 24px;
+      font-weight: bold;
+    }
+
+    li {
+      margin: 12px 0;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>Система бронирования услуг</h1>
+
+  <section class="card">
+    <h2>Записаться</h2>
+
+    <form id="bookingForm">
+      <label>
+        Имя
+        <input id="customerName" required>
+      </label>
+
+      <label>
+        Email
+        <input id="customerEmail" type="email" required>
+      </label>
+
+      <label>
+        Услуга
+        <select id="serviceId" required></select>
+      </label>
+
+      <label>
+        Дата и время
+        <input id="startTime" type="datetime-local" required>
+      </label>
+
+      <button type="submit">Забронировать</button>
+    </form>
+
+    <p id="message"></p>
+  </section>
+
+  <section class="card">
+    <h2>Бронирования</h2>
+    <ul id="bookingList"></ul>
+  </section>
+
+  <script>
+    const message = document.querySelector("#message");
+    const serviceSelect = document.querySelector("#serviceId");
+
+    async function loadServices() {
+      const response = await fetch("/api/services");
+
+      if (!response.ok) {
+        message.textContent = "Не удалось загрузить услуги.";
+        return;
+      }
+
+      const services = await response.json();
+
+      serviceSelect.innerHTML = services.map(service => `
+        <option value="${service.id}">
+          ${escapeHtml(service.name)} — ${service.durationMinutes} мин., ${service.price} р
+        </option>
+      `).join("");
+    }
+
+    async function loadBookings() {
+      const response = await fetch("/api/bookings");
+
+      if (!response.ok) {
+        document.querySelector("#bookingList").innerHTML =
+          "<li>Не удалось загрузить бронирования.</li>";
+        return;
+      }
+
+      const bookings = await response.json();
+
+      if (bookings.length === 0) {
+        document.querySelector("#bookingList").innerHTML =
+          "<li>Пока бронирований нет.</li>";
+        return;
+      }
+
+      document.querySelector("#bookingList").innerHTML =
+        bookings.map(booking => {
+          const serviceName = booking.serviceItem
+            ? escapeHtml(booking.serviceItem.name)
+            : "Услуга";
+
+          const date = new Date(booking.startTime).toLocaleString("ru-RU");
+
+          const cancelButton = booking.status === "Active"
+            ? `<button class="cancel" onclick="cancelBooking(${booking.id})">Отменить</button>`
+            : "";
+
+          return `<li>
+            ${escapeHtml(booking.customerName)} — ${serviceName},
+            ${date}, статус: ${escapeHtml(booking.status)}
+            ${cancelButton}
+          </li>`;
+        }).join("");
+    }
+
+    document.querySelector("#bookingForm").addEventListener(
+      "submit",
+      async event => {
+        event.preventDefault();
+        message.textContent = "Отправка…";
+
+        const localDate = document.querySelector("#startTime").value;
+
+        const request = {
+          customerName: document.querySelector("#customerName").value,
+          customerEmail: document.querySelector("#customerEmail").value,
+          serviceItemId: Number(serviceSelect.value),
+          startTime: new Date(localDate).toISOString()
+        };
+
+        const response = await fetch("/api/bookings", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(request)
+        });
+
+        if (response.ok) {
+          message.textContent = "Бронирование создано!";
+          event.target.reset();
+          await loadBookings();
+        } else {
+          const error = await response.json().catch(() => null);
+          message.textContent =
+            error?.message || "Не удалось создать бронирование.";
+        }
+      }
+    );
+
+    async function cancelBooking(id) {
+      const response = await fetch(`/api/bookings/${id}`, {
+        method: "DELETE"
+      });
+
+      message.textContent = response.ok
+        ? "Бронирование отменено."
+        : "Не удалось отменить запись.";
+
+      await loadBookings();
+    }
+
+    function escapeHtml(value) {
+      const element = document.createElement("span");
+      element.textContent = value ?? "";
+      return element.innerHTML;
+    }
+
+    loadServices();
+    loadBookings();
+  </script>
+</body>
+</html>
